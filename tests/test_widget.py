@@ -1,6 +1,8 @@
-import pytest
-from src.widget import mask_account_card, get_date
 from typing import List
+
+import pytest
+
+from src.widget import get_date, mask_account_card
 
 
 # Фикстуры для test_widget.py
@@ -22,16 +24,19 @@ def sample_account_card_strings() -> List[str]:
 class TestMaskAccountCard:
     """Тесты для функции mask_account_card."""
 
-    @pytest.mark.parametrize("input_string, expected", [
-        ("Счет 73654108430135874305", "Счет **4305"),
-        ("Visa Platinum 7000792289606361", "Visa Platinum 7000 79** **** 6361"),
-        ("MasterCard 5555555555554444", "MasterCard 5555 55** **** 4444"),
-        ("МИР 1234567890123456", "МИР 1234 56** **** 3456"),
-        ("Maestro 4111111111111111", "Maestro 4111 11** **** 1111"),
-        ("Visa Classic 1234567890123456", "Visa Classic 1234 56** **** 3456"),
-        ("Счет 40817810099910004321", "Счет **4321"),
-        ("Карта 7000792289606361", "Карта 7000 79** **** 6361"),
-    ])
+    @pytest.mark.parametrize(
+        "input_string, expected",
+        [
+            ("Счет 73654108430135874305", "Счет **4305"),
+            ("Visa Platinum 7000792289606361", "Visa Platinum 7000 79** **** 6361"),
+            ("MasterCard 5555555555554444", "MasterCard 5555 55** **** 4444"),
+            ("МИР 1234567890123456", "МИР 1234 56** **** 3456"),
+            ("Maestro 4111111111111111", "Maestro 4111 11** **** 1111"),
+            ("Visa Classic 1234567890123456", "Visa Classic 1234 56** **** 3456"),
+            ("Счет 40817810099910004321", "Счет **4321"),
+            ("Карта 7000792289606361", "Карта 7000 79** **** 6361"),
+        ],
+    )
     def test_valid_account_card_strings(self, input_string: str, expected: str) -> None:
         """Тестирование корректных строк с картами и счетами."""
         result = mask_account_card(input_string)
@@ -70,12 +75,15 @@ class TestMaskAccountCard:
 class TestGetDate:
     """Тесты для функции get_date."""
 
-    @pytest.mark.parametrize("input_date, expected", [
-        ("2024-03-11T02:26:18.671407", "11.03.2024"),
-        ("2023-12-31T23:59:59.999999", "31.12.2023"),
-        ("2024-01-01T00:00:00.000000", "01.01.2024"),
-        ("2024-02-29T12:30:45.123456", "29.02.2024"),  # Високосный год
-    ])
+    @pytest.mark.parametrize(
+        "input_date, expected",
+        [
+            ("2024-03-11T02:26:18.671407", "11.03.2024"),
+            ("2023-12-31T23:59:59.999999", "31.12.2023"),
+            ("2024-01-01T00:00:00.000000", "01.01.2024"),
+            ("2024-02-29T12:30:45.123456", "29.02.2024"),  # Високосный год
+        ],
+    )
     def test_valid_dates(self, input_date: str, expected: str) -> None:
         """Тестирование корректных дат."""
         result = get_date(input_date)

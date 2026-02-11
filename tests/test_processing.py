@@ -1,6 +1,8 @@
+from typing import Any, Dict, List
+
 import pytest
+
 from src.processing import filter_by_state, sort_by_date
-from typing import List, Dict, Any
 
 
 # Фикстуры для test_processing.py
@@ -62,14 +64,18 @@ def sample_transactions() -> List[Dict[str, Any]]:
 class TestFilterByState:
     """Тесты для функции filter_by_state."""
 
-    @pytest.mark.parametrize("state, expected_count", [
-        ("EXECUTED", 3),
-        ("PENDING", 1),
-        ("CANCELED", 1),
-        ("UNKNOWN", 0),
-    ])
-    def test_filter_by_state(self, sample_transactions: List[Dict[str, Any]],
-                             state: str, expected_count: int) -> None:
+    @pytest.mark.parametrize(
+        "state, expected_count",
+        [
+            ("EXECUTED", 3),
+            ("PENDING", 1),
+            ("CANCELED", 1),
+            ("UNKNOWN", 0),
+        ],
+    )
+    def test_filter_by_state(
+        self, sample_transactions: List[Dict[str, Any]], state: str, expected_count: int
+    ) -> None:
         """Тестирование фильтрации по различным статусам."""
         result = filter_by_state(sample_transactions, state)
         assert len(result) == expected_count
@@ -78,7 +84,9 @@ class TestFilterByState:
         for transaction in result:
             assert transaction["state"] == state
 
-    def test_filter_by_state_default(self, sample_transactions: List[Dict[str, Any]]) -> None:
+    def test_filter_by_state_default(
+        self, sample_transactions: List[Dict[str, Any]]
+    ) -> None:
         """Тестирование фильтрации со значением по умолчанию."""
         result = filter_by_state(sample_transactions)  # По умолчанию "EXECUTED"
         assert len(result) == 3
@@ -107,7 +115,9 @@ class TestFilterByState:
 class TestSortByDate:
     """Тесты для функции sort_by_date."""
 
-    def test_sort_by_date_descending(self, sample_transactions: List[Dict[str, Any]]) -> None:
+    def test_sort_by_date_descending(
+        self, sample_transactions: List[Dict[str, Any]]
+    ) -> None:
         """Тестирование сортировки по убыванию даты (по умолчанию)."""
         result = sort_by_date(sample_transactions)
 
@@ -123,7 +133,9 @@ class TestSortByDate:
         assert result[-1]["date"] == "2024-03-07T08:00:00.000000"
         assert result[-1]["id"] == 5
 
-    def test_sort_by_date_ascending(self, sample_transactions: List[Dict[str, Any]]) -> None:
+    def test_sort_by_date_ascending(
+        self, sample_transactions: List[Dict[str, Any]]
+    ) -> None:
         """Тестирование сортировки по возрастанию даты."""
         result = sort_by_date(sample_transactions, reverse=False)
 
@@ -146,7 +158,14 @@ class TestSortByDate:
 
     def test_sort_by_date_single_element(self) -> None:
         """Тестирование сортировки списка с одним элементом."""
-        transactions = [{"id": 1, "date": "2024-03-11T10:00:00.000000", "amount": "100", "state": "EXECUTED"}]
+        transactions = [
+            {
+                "id": 1,
+                "date": "2024-03-11T10:00:00.000000",
+                "amount": "100",
+                "state": "EXECUTED",
+            }
+        ]
 
         result = sort_by_date(transactions)
         assert len(result) == 1

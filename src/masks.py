@@ -61,7 +61,15 @@ def mask_personal_data(data: Dict[str, Any]) -> Dict[str, Any]:
     result = data.copy()
 
     # Маскируем номера карт для всех возможных названий полей
-    card_fields = ["card", "card_number", "credit_card", "debit_card", "bank_card", "payment_card", "cardNumber"]
+    card_fields = [
+        "card",
+        "card_number",
+        "credit_card",
+        "debit_card",
+        "bank_card",
+        "payment_card",
+        "cardNumber",
+    ]
 
     for field in card_fields:
         if field in result:
@@ -74,8 +82,14 @@ def mask_personal_data(data: Dict[str, Any]) -> Dict[str, Any]:
                     result[f"{field}_error"] = "Неверный номер карты"
 
     # Маскируем номера счетов для всех возможных названий полей
-    account_fields = ["account", "account_number", "bank_account", "savings_account", "current_account",
-                      "accountNumber"]
+    account_fields = [
+        "account",
+        "account_number",
+        "bank_account",
+        "savings_account",
+        "current_account",
+        "accountNumber",
+    ]
 
     for field in account_fields:
         if field in result:
