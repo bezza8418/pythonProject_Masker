@@ -54,38 +54,38 @@ def mask_personal_data(data: Dict[str, Any]) -> Dict[str, Any]:
     Главная функция маскировки персональных данных.
     Использует уже существующие функции маскировки из проекта.
     """
+    if not data:
+        return {}
+
     # Создаем копию, чтобы не изменять оригинальные данные
     result = data.copy()
 
-    # Список возможных названий полей для карт
+    # Маскируем номера карт для всех возможных названий полей
     card_fields = ["card", "card_number", "credit_card", "debit_card", "bank_card", "payment_card", "cardNumber"]
 
-    # Список возможных названий полей для счетов
-    account_fields = [
-        "account",
-        "account_number",
-        "bank_account",
-        "savings_account",
-        "current_account",
-        "accountNumber",
-    ]
-
-    # Маскируем номера карт
     for field in card_fields:
-        if field in result[field]:
-            try:
-                result[field] = get_mask_card_number(str(result[field]))
-            except ValueError as e:
-                # Если номер не корректен, оставляем как есть или помечаем ошибкой
-                result[f"{field}_error"] = str(e)
-    # Маскируем номера счетов
+        if field in result:
+            value = result[field]
+            if value is not None and str(value).strip():
+                try:
+                    result[field] = get_mask_card_number(str(value))
+                except ValueError:
+                    # Если номер не корректен, добавляем пометку об ошибке
+                    result[f"{field}_error"] = "Неверный номер карты"
+
+    # Маскируем номера счетов для всех возможных названий полей
+    account_fields = ["account", "account_number", "bank_account", "savings_account", "current_account",
+                      "accountNumber"]
+
     for field in account_fields:
-        if field in result and result[field]:
-            try:
-                result[field] = get_mask_account(str(result[field]))
-            except ValueError as e:
-                # Если номер не корректен, оставляем как есть или помечаем ошибкой
-                result[f"{field}_error"] = str(e)
+        if field in result:
+            value = result[field]
+            if value is not None and str(value).strip():
+                try:
+                    result[field] = get_mask_account(str(value))
+                except ValueError:
+                    # Если номер не корректен, добавляем пометку об ошибке
+                    result[f"{field}_error"] = "Неверный номер счета"
 
     return result
 
