@@ -30,4 +30,3 @@ def sort_by_date(
         key=lambda x: parse_date(x.get("date", "")),
         reverse=reverse
     )
-
