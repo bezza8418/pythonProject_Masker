@@ -21,3 +21,18 @@ lint = [
     "black (>=26.1.0,<27.0.0)",
     "isort (>=7.0.0,<8.0.0)"
 ]
+
+# зависимость pytest 11.02.2026
+[tool.poetry]
+name = "my-project"
+version = "0.1.0"
+description = ""
+package-mode = false  # Если не нужно собирать пакет
+
+[tool.poetry.dependencies]
+python = ">=3.14"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+black = ">=26.1.0,<27.0.0"
+
