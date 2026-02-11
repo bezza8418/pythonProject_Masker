@@ -1,8 +1,6 @@
-from typing import List
-
 import pytest
-
 from src.widget import mask_account_card, get_date
+from typing import List
 
 
 # Фикстуры для test_widget.py
@@ -54,6 +52,7 @@ class TestMaskAccountCard:
         ("Счет 7365 4108 4301 3587 4305", "Счет **4305"),
         ("Visa Platinum 7000 7922 8960 6361", "Visa Platinum 7000 79** **** 6361"),
         ("MasterCard 5555-5555-5555-4444", "MasterCard 5555 55** **** 4444"),
+        ("Счет\t73654108430135874305", "Счет **4305"),  # Табуляция
     ])
     def test_strings_with_separators(self, input_string: str, expected: str) -> None:
         """Тестирование строк с разделителями в номерах."""
@@ -77,14 +76,16 @@ class TestMaskAccountCard:
         # Функция должна вернуть оригинальную строку или строку с пометкой об ошибке
         assert invalid_input in result or "ошибка" in result
 
-    def test_case_insensitive_account_type(self) -> None:
+    @pytest.mark.parametrize("input_string", [
+        "счет 73654108430135874305",
+        "СЧЕТ 73654108430135874305",
+        "Account 73654108430135874305",
+        "account 73654108430135874305",
+    ])
+    def test_case_insensitive_account_type(self, input_string: str) -> None:
         """Тестирование нечувствительности к регистру типа счета."""
-        inputs = ["счет 73654108430135874305", "СЧЕТ 73654108430135874305", "Account 73654108430135874305"]
-        expected = "**4305"
-
-        for input_str in inputs:
-            result = mask_account_card(input_str)
-            assert expected in result
+        result = mask_account_card(input_string)
+        assert "**4305" in result
 
     @pytest.mark.parametrize("input_string", [
         "Счет 7365410843013587430",  # 19 цифр
@@ -93,7 +94,18 @@ class TestMaskAccountCard:
     def test_incorrect_length_numbers(self, input_string: str) -> None:
         """Тестирование номеров с некорректной длиной."""
         result = mask_account_card(input_string)
-        assert "ошибка" in result
+        assert "ошибка" in result.lower()
+
+    def test_complex_strings(self) -> None:
+        """Тестирование сложных строк."""
+        # С дополнительным текстом
+        result = mask_account_card("Счет 73654108430135874305 дополнительный текст")
+        assert "**4305" in result
+
+        # Несколько чисел в строке
+        result = mask_account_card("Карта 7000792289606361 и Счет 73654108430135874305")
+        # Проверяем что маскировка применилась только к первому номеру
+        assert "Карта" in result
 
 
 class TestGetDate:
@@ -105,6 +117,8 @@ class TestGetDate:
         ("2024-01-01T00:00:00.000000", "01.01.2024"),
         ("2024-02-29T12:30:45.123456", "29.02.2024"),  # Високосный год
         ("2000-02-29T00:00:00.000000", "29.02.2000"),  # Високосный год 2000
+        ("0001-01-01T00:00:00.000000", "01.01.0001"),  # Минимальная дата
+        ("9999-12-31T23:59:59.999999", "31.12.9999"),  # Максимальная дата
     ])
     def test_valid_dates(self, input_date: str, expected: str) -> None:
         """Тестирование корректных дат."""
@@ -118,27 +132,56 @@ class TestGetDate:
 
     @pytest.mark.parametrize("invalid_date", [
         "2024/03/11T02:26:18",  # неправильный разделитель
-        "",  # пустая строка
-        "not-a-date",  # не дата
         "2024-13-11T02:26:18",  # неверный месяц
         "2024-02-30T02:26:18",  # неверный день
     ])
-    def test_invalid_dates(self, invalid_date: str) -> None:
-        """Тестирование некорректных дат."""
-        with pytest.raises((ValueError, IndexError)):
+    def test_invalid_dates_value_error(self, invalid_date: str) -> None:
+        """Тестирование некорректных дат, которые вызывают ValueError."""
+        with pytest.raises(ValueError):
             get_date(invalid_date)
 
-    def test_date_with_z_suffix(self) -> None:
+    def test_empty_string_date(self) -> None:
+        """Тестирование пустой строки как даты."""
+        # Проверяем отдельно возможные исключения
+        exception_raised = False
+        try:
+            get_date("")
+        except ValueError:
+            exception_raised = True
+        except IndexError:
+            exception_raised = True
+
+        assert exception_raised, "Пустая строка должна вызывать ValueError или IndexError"
+
+    def test_invalid_format_date(self) -> None:
+        """Тестирование строки не в формате даты."""
+        # Проверяем отдельно возможные исключения
+        exception_raised = False
+        try:
+            get_date("not-a-date")
+        except ValueError:
+            exception_raised = True
+        except IndexError:
+            exception_raised = True
+
+        assert exception_raised, "Не-дата должна вызывать ValueError или IndexError"
+
+    @pytest.mark.parametrize("date_with_z", [
+        "2024-03-11T02:26:18.671407Z",
+        "2024-03-11T02:26:18.671407z",
+        "2024-03-11T02:26:18Z",
+    ])
+    def test_date_with_z_suffix(self, date_with_z: str) -> None:
         """Тестирование даты с Z-суффиксом."""
-        result = get_date("2024-03-11T02:26:18.671407Z")
+        result = get_date(date_with_z)
         assert result == "11.03.2024"
 
     def test_edge_case_dates(self) -> None:
         """Тестирование граничных случаев с датами."""
-        # Минимальная дата
-        result = get_date("0001-01-01T00:00:00.000000")
-        assert result == "01.01.0001"
+        # Дата с миллисекундами
+        result = get_date("2024-03-11T02:26:18.123456")
+        assert result == "11.03.2024"
 
-        # Максимальная дата (в разумных пределах)
-        result = get_date("9999-12-31T23:59:59.999999")
-        assert result == "31.12.9999"
+        # Дата только с секундами
+        result = get_date("2024-03-11T02:26:18")
+        assert result == "11.03.2024"

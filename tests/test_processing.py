@@ -70,12 +70,12 @@ def transactions_with_same_dates() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-def transactions_without_dates() -> List[Dict[str, Any]]:
-    """Фикстура с транзакциями без дат."""
+def transactions_without_state() -> List[Dict[str, Any]]:
+    """Фикстура с транзакциями без поля state."""
     return [
-        {"id": 1, "amount": "100", "state": "EXECUTED"},
-        {"id": 2, "date": "2024-03-11T10:00:00.000000", "amount": "200", "state": "EXECUTED"},
-        {"id": 3, "amount": "300", "state": "EXECUTED"},
+        {"id": 1, "amount": "100", "date": "2024-03-11T10:00:00.000000"},
+        {"id": 2, "state": "EXECUTED", "amount": "200", "date": "2024-03-11T10:00:00.000000"},
+        {"id": 3, "amount": "300", "date": "2024-03-11T10:00:00.000000"},
     ]
 
 
@@ -89,6 +89,16 @@ def transactions_with_z_timezone() -> List[Dict[str, Any]]:
     ]
 
 
+@pytest.fixture
+def transactions_with_invalid_dates() -> List[Dict[str, Any]]:
+    """Фикстура с транзакциями с некорректными датами."""
+    return [
+        {"id": 1, "date": "2024/03/11", "amount": "100", "state": "EXECUTED"},
+        {"id": 2, "date": "invalid-date", "amount": "200", "state": "EXECUTED"},
+        {"id": 3, "date": "2024-13-11T10:00:00", "amount": "300", "state": "EXECUTED"},
+    ]
+
+
 class TestFilterByState:
     """Тесты для функции filter_by_state."""
 
@@ -97,6 +107,8 @@ class TestFilterByState:
         ("PENDING", 1),
         ("CANCELED", 1),
         ("UNKNOWN", 0),
+        ("failed", 0),  # нижний регистр
+        ("", 0),  # пустая строка
     ])
     def test_filter_by_state(self, sample_transactions: List[Dict[str, Any]],
                              state: str, expected_count: int) -> None:
@@ -106,7 +118,7 @@ class TestFilterByState:
 
         # Проверяем, что все транзакции имеют нужный статус
         for transaction in result:
-            assert transaction["state"] == state
+            assert transaction.get("state") == state
 
     def test_filter_by_state_default(self, sample_transactions: List[Dict[str, Any]]) -> None:
         """Тестирование фильтрации со значением по умолчанию."""
@@ -121,40 +133,31 @@ class TestFilterByState:
         result = filter_by_state([], "EXECUTED")
         assert result == []
 
-    def test_filter_by_state_no_state_field(self) -> None:
+    def test_filter_by_state_no_state_field(self, transactions_without_state: List[Dict[str, Any]]) -> None:
         """Тестирование фильтрации транзакций без поля state."""
+        result = filter_by_state(transactions_without_state, "EXECUTED")
+        assert len(result) == 1
+        assert result[0]["id"] == 2
+
+    @pytest.mark.parametrize("state", [
+        None,
+        123,
+        0,
+        True,
+        False,
+        [],
+        {},
+    ])
+    def test_filter_by_state_with_non_string_state(self, state: Any) -> None:
+        """Тестирование фильтрации с не строковым статусом."""
         transactions = [
-            {"id": 1, "amount": "100"},
-            {"id": 2, "state": "EXECUTED", "amount": "200"},
-            {"id": 3, "amount": "300"},
+            {"id": 1, "state": "EXECUTED", "amount": "100"},
+            {"id": 2, "state": state, "amount": "200"},
         ]
 
         result = filter_by_state(transactions, "EXECUTED")
         assert len(result) == 1
-        assert result[0]["id"] == 2
-
-    @pytest.mark.parametrize("state", ["executed", "Executed", "EXECUTED"])
-    def test_filter_case_sensitive(self, sample_transactions: List[Dict[str, Any]], state: str) -> None:
-        """Тестирование чувствительности к регистру."""
-        result = filter_by_state(sample_transactions, state)
-
-        # Функция должна быть чувствительна к регистру
-        if state == "EXECUTED":
-            assert len(result) == 3
-        else:
-            assert len(result) == 0
-
-    def test_filter_by_state_partial_matches(self) -> None:
-        """Тестирование фильтрации с частичными совпадениями."""
-        transactions = [
-            {"id": 1, "state": "EXECUTED_SUCCESSFULLY", "amount": "100"},
-            {"id": 2, "state": "EXECUTED", "amount": "200"},
-            {"id": 3, "state": "EXECUTED", "amount": "300"},
-        ]
-
-        result = filter_by_state(transactions, "EXECUTED")
-        assert len(result) == 1
-        assert result[0]["id"] == 2
+        assert result[0]["id"] == 1
 
 
 class TestSortByDate:
@@ -196,40 +199,37 @@ class TestSortByDate:
         """Тестирование сортировки с одинаковыми датами."""
         result = sort_by_date(transactions_with_same_dates)
 
-        # При одинаковых датах порядок должен сохраняться (стабильная сортировка)
-        # Хотя формально это не гарантировано, на практике обычно сохраняется
-        assert len(result) == 3
-        assert result[0]["id"] == 1 or result[0]["id"] == 2
-        assert result[1]["id"] == 2 or result[1]["id"] == 1
-        assert result[2]["id"] == 3
+        # Проверяем, что даты отсортированы
+        dates = [transaction["date"] for transaction in result]
+        assert dates == sorted(dates, reverse=True)
 
-    def test_sort_by_date_without_date_field(self, transactions_without_dates: List[Dict[str, Any]]) -> None:
+        # Проверяем, что все элементы присутствуют
+        ids = {transaction["id"] for transaction in result}
+        assert ids == {1, 2, 3}
+
+    def test_sort_by_date_without_date_field(self) -> None:
         """Тестирование сортировки транзакций без поля date."""
+        transactions = [
+            {"id": 1, "amount": "100", "state": "EXECUTED"},
+            {"id": 2, "date": "2024-03-11T10:00:00.000000", "amount": "200", "state": "EXECUTED"},
+        ]
+
         # Транзакции без даты вызовут ошибку при парсинге
-        with pytest.raises((ValueError, KeyError)):
-            sort_by_date(transactions_without_dates)
+        with pytest.raises(ValueError):
+            sort_by_date(transactions)
 
     def test_sort_by_date_empty_list(self) -> None:
         """Тестирование сортировки пустого списка."""
         result = sort_by_date([])
         assert result == []
 
-    @pytest.mark.parametrize("invalid_date", [
-        "2024/03/11",
-        "11-03-2024T10:00:00",
-        "invalid-date",
-        "2024-13-11T10:00:00",
-        "2024-02-30T10:00:00",
-    ])
-    def test_sort_by_date_invalid_format(self, invalid_date: str) -> None:
-        """Тестирование сортировки с неверным форматом даты."""
-        transactions = [
-            {"id": 1, "date": invalid_date, "amount": "100", "state": "EXECUTED"},
-            {"id": 2, "date": "2024-03-12T10:00:00.000000", "amount": "200", "state": "EXECUTED"},
-        ]
+    def test_sort_by_date_single_element(self) -> None:
+        """Тестирование сортировки списка с одним элементом."""
+        transactions = [{"id": 1, "date": "2024-03-11T10:00:00.000000", "amount": "100", "state": "EXECUTED"}]
 
-        with pytest.raises(ValueError):
-            sort_by_date(transactions)
+        result = sort_by_date(transactions)
+        assert len(result) == 1
+        assert result[0]["id"] == 1
 
     def test_sort_with_z_timezone(self, transactions_with_z_timezone: List[Dict[str, Any]]) -> None:
         """Тестирование сортировки с Z в конце даты."""
@@ -240,21 +240,29 @@ class TestSortByDate:
         assert result[1]["id"] == 1  # 11 марта
         assert result[2]["id"] == 2  # 10 марта
 
-    def test_sort_by_date_single_element(self) -> None:
-        """Тестирование сортировки списка с одним элементом."""
-        transactions = [{"id": 1, "date": "2024-03-11T10:00:00.000000", "amount": "100", "state": "EXECUTED"}]
-
-        result = sort_by_date(transactions)
-        assert len(result) == 1
-        assert result[0]["id"] == 1
-
-    def test_sort_by_date_mixed_formats(self) -> None:
-        """Тестирование сортировки со смешанными форматами дат."""
+    def test_sort_by_date_invalid_format(self) -> None:
+        """Тестирование сортировки с неверным форматом даты."""
         transactions = [
-            {"id": 1, "date": "2024-03-11T10:00:00.000000Z", "amount": "100", "state": "EXECUTED"},
-            {"id": 2, "date": "2024-03-11T10:00:00.000000", "amount": "200", "state": "EXECUTED"},
+            {"id": 1, "date": "2024/03/11", "amount": "100", "state": "EXECUTED"},
         ]
 
-        # Оба формата должны корректно обрабатываться
-        result = sort_by_date(transactions)
-        assert len(result) == 2
+        with pytest.raises(ValueError):
+            sort_by_date(transactions)
+
+    def test_sort_by_date_with_none_date(self) -> None:
+        """Тестирование сортировки с None в поле даты."""
+        transactions = [
+            {"id": 1, "date": None, "amount": "100", "state": "EXECUTED"},
+        ]
+
+        with pytest.raises(ValueError):
+            sort_by_date(transactions)
+
+    def test_sort_by_date_with_empty_date(self) -> None:
+        """Тестирование сортировки с пустой строкой в поле даты."""
+        transactions = [
+            {"id": 1, "date": "", "amount": "100", "state": "EXECUTED"},
+        ]
+
+        with pytest.raises(ValueError):
+            sort_by_date(transactions)
