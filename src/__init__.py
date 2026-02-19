@@ -1,8 +1,8 @@
 """Пакет для маскирования банковских реквизитов."""
 
-from src.masks import (get_mask_account, get_mask_card_number,
-                       mask_financial_info, mask_personal_data)
+from src.masks import get_mask_account, get_mask_card_number, mask_financial_info, mask_personal_data
 from src.widget import get_date, mask_account_card
+from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 __all__ = [
     # Из mask.py
@@ -13,4 +13,8 @@ __all__ = [
     # Из widget.py
     "mask_account_card",
     "get_date",
+    # Из generators.py
+    "filter_by_currency",
+    "transaction_descriptions",
+    "card_number_generator",
 ]
