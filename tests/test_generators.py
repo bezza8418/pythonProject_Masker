@@ -1,7 +1,8 @@
 """Тесты для модуля generators."""
 
 import pytest
-from typing import Dict, List, Any
+# from typing import Dict, List, Any
+from typing import Dict, Any, List, Optional, Union
 
 from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
@@ -95,7 +96,8 @@ def empty_transactions() -> List:
 
 
 @pytest.fixture
-def invalid_transactions() -> List[Dict[str, Any]]:
+# def invalid_transactions() -> List[Dict[str, Any]]:
+def invalid_transactions() -> List[Optional[Union[Dict[str, Any], str]]]:
     """Фикстура с транзакциями некорректной структуры."""
     return [
         {"id": 1, "description": "Тест"},  # Нет operationAmount
