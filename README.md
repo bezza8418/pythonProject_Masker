@@ -21,7 +21,7 @@ git clone https://github.com/bezza8418/pythonProject_Masker
 cd pythonProject_Masker
 ```
 
-2. **Установите зависимости:**
+2.** Установите зависимости:**
 ```bash
 pip install -r requirements.txt
 ```
@@ -131,18 +131,34 @@ sorted_trans = sort_by_date(transactions, reverse=True)
 ```python
 from src.generators import filter_by_currency
 
-usd_transactions = filter_by_currency(transactions, "USD")
-for trans in usd_transactions:
-    print(trans["id"], trans["operationAmount"]["amount"])
+transactions = [
+    {"id": 1, "operationAmount": {"currency": {"code": "USD"}}},
+    {"id": 2, "operationAmount": {"currency": {"code": "EUR"}}},
+    {"id": 3, "operationAmount": {"currency": {"code": "USD"}}},
+]
+
+usd_transactions = list(filter_by_currency(transactions, "USD"))
+print([t["id"] for t in usd_transactions])  # [1, 3]
 ```
 
 ### 11. Получение описаний транзакций (`transaction_descriptions`)
 ```python
 from src.generators import transaction_descriptions
 
+# Пример списка транзакций
+transactions = [
+    {"description": "Перевод организации"},
+    {"description": "Перевод со счета на счет"},
+    {"description": "Перевод с карты на карту"},
+]
+
 descriptions = transaction_descriptions(transactions)
 for desc in descriptions:
     print(desc)
+# Вывод:
+# Перевод организации
+# Перевод со счета на счет
+# Перевод с карты на карту
 ```
 
 ### 12. Генератор номеров карт (`card_number_generator`)
@@ -156,6 +172,29 @@ for card in card_number_generator(1, 5):
 # 0000 0000 0000 0003
 # 0000 0000 0000 0004
 # 0000 0000 0000 0005
+```
+
+### 13. Логирование функций с декоратором `log`
+
+Декоратор для автоматического логирования вызовов функций.
+
+```python
+from src.decorators import log
+
+# Логирование в консоль
+@log()
+def divide(a: int, b: int) -> float:
+    return a / b
+
+divide(10, 2)  # В консоль выведется: "divide ok"
+divide(10, 0)  # В консоль выведется: "divide error: ZeroDivisionError. Inputs: (10, 0), {}"
+
+# Логирование в файл
+@log(filename="mylog.txt")
+def add(a: int, b: int) -> int:
+    return a + b
+
+add(5, 3)  # В файл mylog.txt запишется: "add ok"
 ```
 
 ## 🧪 Тестирование
@@ -176,6 +215,7 @@ pytest tests/test_generators.py -v
 pytest tests/test_masks.py -v
 pytest tests/test_widget.py -v
 pytest tests/test_processing.py -v
+pytest tests/test_decorators.py -v
 ```
 
 ### Статистика покрытия (98%)
@@ -232,13 +272,15 @@ pythonProject_Masker/
 │   ├── masks.py            # Маскировка карт/счетов
 │   ├── processing.py       # Фильтрация и сортировка транзакций
 │   ├── widget.py           # Обработка строк карт/счетов
-│   └── generators.py       # Генераторы для работы с транзакциями
+│   ├── generators.py       # Генераторы для работы с транзакциями
+│   └── decorators.py       # Декораторы для логирования
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_masks.py       # Тесты для masks.py
 │   ├── test_widget.py      # Тесты для widget.py
 │   ├── test_processing.py  # Тесты для processing.py
-│   └── test_generators.py  # Тесты для generators.py
+│   ├── test_generators.py  # Тесты для generators.py
+│   └── test_decorators.py  # Тесты для decorators.py
 ├── .flake8                 # Конфигурация flake8
 ├── .gitignore              # Игнорируемые файлы
 ├── .coverage               # Данные о покрытии
@@ -251,7 +293,7 @@ pythonProject_Masker/
 
 ## 📄 Лицензия
 
-Этот проект лицензирован по [лицензии MIT](LICENSE).
+Этот проект лицензирован по [лицензии MIT].
 
 ## 🤝 Вклад в проект
 
