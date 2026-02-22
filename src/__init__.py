@@ -8,7 +8,11 @@ from src.masks import (
     process_user_data,
 )
 from src.widget import get_date, mask_account_card
-from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
 from src.decorators import log  # Добавляем импорт декоратора
 
 __all__ = [

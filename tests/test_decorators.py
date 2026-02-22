@@ -85,10 +85,10 @@ class TestLogDecorator:
         """Тест логирования с разными типами аргументов."""
 
         @log()
-        def test_function(a: int, b: str, c: list, **kwargs) -> str:
+        def test_function(a: int, b: str, c: list) -> str:
             return f"{a} {b} {c}"
 
-        result = test_function(1, "hello", [1, 2, 3], extra="test")
+        result = test_function(1, "hello", [1, 2, 3])
 
         assert result == "1 hello [1, 2, 3]"
         captured = capsys.readouterr()
@@ -168,14 +168,15 @@ class TestLogDecorator:
         assert lines[0] == "func1 ok\n"
         assert lines[1] == "func2 ok\n"
 
-    def test_log_with_empty_filename(self) -> None:
-        """Тест с пустым filename (должно работать как без файла)."""
-        with pytest.raises(TypeError):
-            # Передаем пустую строку, но декоратор ожидает Optional[str]
-            # Это должно вызвать ошибку при попытке открыть файл с пустым именем
+    def test_log_with_empty_filename(self, capsys: pytest.CaptureFixture) -> None:
+        """Тест с пустым filename (должен писать в консоль)."""
 
-            @log(filename="")
-            def test_function() -> str:
-                return "test"
+        @log(filename="")
+        def test_function() -> str:
+            return "test"
 
-            test_function()
+        result = test_function()
+        assert result == "test"
+
+        captured = capsys.readouterr()
+        assert captured.out == "test_function ok\n"

@@ -3,9 +3,8 @@
 """
 
 import functools
-import logging
 import sys
-from typing import Any, Callable, Optional, TextIO, Union
+from typing import Any, Callable, Optional, TextIO
 
 
 def log(filename: Optional[str] = None) -> Callable:

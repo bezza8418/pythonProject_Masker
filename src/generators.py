@@ -3,7 +3,9 @@
 from typing import Dict, Generator, Iterator, List
 
 
-def filter_by_currency(transactions: List[Dict], currency: str = "USD") -> Iterator[Dict]:
+def filter_by_currency(
+    transactions: List[Dict], currency: str = "USD"
+) -> Iterator[Dict]:
     """
     Фильтрует транзакции по валюте.
 
@@ -23,7 +25,7 @@ def filter_by_currency(transactions: List[Dict], currency: str = "USD") -> Itera
 
             if transaction_currency == currency:
                 yield transaction
-        except (KeyError, AttributeError, TypeError):
+        except KeyError, AttributeError, TypeError:
             # Пропускаем транзакции с некорректной структурой
             continue
 
@@ -43,7 +45,7 @@ def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, N
             description = transaction.get("description", "")
             if description:
                 yield description
-        except (KeyError, AttributeError, TypeError):
+        except KeyError, AttributeError, TypeError:
             continue
 
 
@@ -62,5 +64,7 @@ def card_number_generator(start: int, end: int) -> Generator[str, None, None]:
         # Форматируем номер с ведущими нулями до 16 цифр
         number_str = str(number).zfill(16)
         # Разбиваем на группы по 4 цифры
-        formatted = f"{number_str[:4]} {number_str[4:8]} {number_str[8:12]} {number_str[12:16]}"
+        formatted = (
+            f"{number_str[:4]} {number_str[4:8]} {number_str[8:12]} {number_str[12:16]}"
+        )
         yield formatted
