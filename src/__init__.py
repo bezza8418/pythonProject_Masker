@@ -1,4 +1,4 @@
-"""Пакет для маскирования банковских реквизитов."""
+"""Пакет для маскирования банковских реквизитов и работы с транзакциями."""
 
 from src.masks import (
     get_mask_account,
@@ -13,7 +13,9 @@ from src.generators import (
     filter_by_currency,
     transaction_descriptions,
 )
-from src.decorators import log  # Добавляем импорт декоратора
+from src.decorators import log
+from src.utils import load_transactions
+from src.external_api import convert_amount, get_exchange_rate, get_transaction_amount_in_rub
 
 __all__ = [
     # Из mask.py
@@ -31,4 +33,10 @@ __all__ = [
     "card_number_generator",
     # Из decorators.py
     "log",
+    # Из utils.py
+    "load_transactions",
+    # Из external_api.py
+    "convert_amount",
+    "get_exchange_rate",
+    "get_transaction_amount_in_rub",
 ]
