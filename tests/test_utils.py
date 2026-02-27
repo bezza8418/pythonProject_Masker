@@ -15,7 +15,9 @@ from src.utils import load_transactions
 @pytest.fixture
 def temp_json_file() -> Generator[str, None, None]:
     """Фикстура для создания временного JSON файла."""
-    with tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8', suffix='.json', delete=False) as tmp:
+    with tempfile.NamedTemporaryFile(
+        mode="w+", encoding="utf-8", suffix=".json", delete=False
+    ) as tmp:
         tmp_path = tmp.name
     yield tmp_path
     # Очистка после теста
@@ -33,11 +35,11 @@ def sample_transactions_data() -> List[Dict[str, Any]]:
             "date": "2019-08-26T10:50:58.294041",
             "operationAmount": {
                 "amount": "31957.58",
-                "currency": {"name": "руб.", "code": "RUB"}
+                "currency": {"name": "руб.", "code": "RUB"},
             },
             "description": "Перевод организации",
             "from": "Maestro 1596837868705199",
-            "to": "Счет 64686473678894779589"
+            "to": "Счет 64686473678894779589",
         },
         {
             "id": 41428829,
@@ -45,22 +47,24 @@ def sample_transactions_data() -> List[Dict[str, Any]]:
             "date": "2019-07-03T18:35:29.512374",
             "operationAmount": {
                 "amount": "8221.37",
-                "currency": {"name": "USD", "code": "USD"}
+                "currency": {"name": "USD", "code": "USD"},
             },
             "description": "Перевод организации",
             "from": "MasterCard 7158300734726758",
-            "to": "Счет 35383033474447895560"
-        }
+            "to": "Счет 35383033474447895560",
+        },
     ]
 
 
 class TestLoadTransactions:
     """Тесты для функции load_transactions."""
 
-    def test_load_transactions_success(self, temp_json_file: str, sample_transactions_data: List[Dict[str, Any]]) -> None:
+    def test_load_transactions_success(
+        self, temp_json_file: str, sample_transactions_data: List[Dict[str, Any]]
+    ) -> None:
         """Тест успешной загрузки транзакций из JSON файла."""
         # Записываем тестовые данные в файл
-        with open(temp_json_file, 'w', encoding='utf-8') as f:
+        with open(temp_json_file, "w", encoding="utf-8") as f:
             json.dump(sample_transactions_data, f)
 
         # Загружаем данные
@@ -81,7 +85,7 @@ class TestLoadTransactions:
     def test_load_transactions_empty_file(self, temp_json_file: str) -> None:
         """Тест загрузки из пустого файла."""
         # Создаем пустой файл
-        with open(temp_json_file, 'w', encoding='utf-8') as f:
+        with open(temp_json_file, "w", encoding="utf-8") as _:
             pass
 
         result = load_transactions(temp_json_file)
@@ -90,7 +94,7 @@ class TestLoadTransactions:
     def test_load_transactions_invalid_json(self, temp_json_file: str) -> None:
         """Тест загрузки из файла с некорректным JSON."""
         # Записываем некорректный JSON
-        with open(temp_json_file, 'w', encoding='utf-8') as f:
+        with open(temp_json_file, "w", encoding="utf-8") as f:
             f.write("{invalid json}")
 
         result = load_transactions(temp_json_file)
@@ -99,7 +103,7 @@ class TestLoadTransactions:
     def test_load_transactions_not_a_list(self, temp_json_file: str) -> None:
         """Тест загрузки из файла, где данные не являются списком."""
         # Записываем словарь вместо списка
-        with open(temp_json_file, 'w', encoding='utf-8') as f:
+        with open(temp_json_file, "w", encoding="utf-8") as f:
             json.dump({"key": "value"}, f)
 
         result = load_transactions(temp_json_file)
@@ -107,7 +111,7 @@ class TestLoadTransactions:
 
     def test_load_transactions_empty_list(self, temp_json_file: str) -> None:
         """Тест загрузки из файла с пустым списком."""
-        with open(temp_json_file, 'w', encoding='utf-8') as f:
+        with open(temp_json_file, "w", encoding="utf-8") as f:
             json.dump([], f)
 
         result = load_transactions(temp_json_file)
@@ -117,6 +121,7 @@ class TestLoadTransactions:
         """Тест загрузки из реального файла operations.json."""
         # Предполагаем, что файл находится в директории data/
         import os
+
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         file_path = os.path.join(project_root, "data", "operations.json")
 
@@ -133,8 +138,11 @@ class TestLoadTransactions:
             # Пропускаем тест, если файл не существует
             pytest.skip("Файл operations.json не найден")
 
-    def test_load_transactions_permission_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_load_transactions_permission_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Тест ошибки доступа к файлу."""
+
         def mock_open(*args, **kwargs):
             raise PermissionError("Permission denied")
 

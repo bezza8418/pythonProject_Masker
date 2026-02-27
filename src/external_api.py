@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Получаем API ключ из переменных окружения
-API_KEY = os.getenv('EXCHANGE_RATES_API_KEY')
+API_KEY = os.getenv("EXCHANGE_RATES_API_KEY")
 API_URL = "https://api.apilayer.com/exchangerates_data/latest"
 
 
@@ -33,14 +33,9 @@ def get_exchange_rate(base_currency: str, target_currency: str = "RUB") -> float
     if not API_KEY:
         raise ValueError("API ключ не найден. Проверьте файл .env")
 
-    headers = {
-        "apikey": API_KEY
-    }
+    headers = {"apikey": API_KEY}
 
-    params = {
-        "base": base_currency,
-        "symbols": target_currency
-    }
+    params = {"base": base_currency, "symbols": target_currency}
 
     try:
         response = requests.get(API_URL, headers=headers, params=params)
@@ -49,7 +44,9 @@ def get_exchange_rate(base_currency: str, target_currency: str = "RUB") -> float
         data = response.json()
 
         if not data.get("success", False):
-            raise Exception(f"API вернул ошибку: {data.get('error', {}).get('info', 'Неизвестная ошибка')}")
+            raise Exception(
+                f"API вернул ошибку: {data.get('error', {}).get('info', 'Неизвестная ошибка')}"
+            )
 
         rates = data.get("rates", {})
         rate = rates.get(target_currency)
@@ -77,7 +74,7 @@ def convert_amount(amount: Union[str, float, int], from_currency: str) -> float:
     # Преобразуем сумму в float
     try:
         amount_float = float(amount)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         raise ValueError(f"Некорректная сумма: {amount}")
 
     # Если валюта уже рубли, возвращаем как есть
@@ -113,7 +110,9 @@ def get_transaction_amount_in_rub(transaction: dict) -> float:
     try:
         # Проверяем наличие operationAmount
         if "operationAmount" not in transaction:
-            raise ValueError("Некорректная структура транзакции: отсутствует operationAmount")
+            raise ValueError(
+                "Некорректная структура транзакции: отсутствует operationAmount"
+            )
 
         operation_amount = transaction.get("operationAmount", {})
 
@@ -125,7 +124,9 @@ def get_transaction_amount_in_rub(transaction: dict) -> float:
         # Проверяем наличие currency
         currency_info = operation_amount.get("currency", {})
         if not currency_info:
-            raise ValueError("Некорректная структура транзакции: отсутствует информация о валюте")
+            raise ValueError(
+                "Некорректная структура транзакции: отсутствует информация о валюте"
+            )
 
         currency_code = currency_info.get("code", "RUB")
 

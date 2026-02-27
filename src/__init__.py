@@ -15,7 +15,11 @@ from src.generators import (
 )
 from src.decorators import log
 from src.utils import load_transactions
-from src.external_api import convert_amount, get_exchange_rate, get_transaction_amount_in_rub
+from src.external_api import (
+    convert_amount,
+    get_exchange_rate,
+    get_transaction_amount_in_rub,
+)
 
 __all__ = [
     # Из mask.py

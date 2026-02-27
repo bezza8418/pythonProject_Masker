@@ -50,7 +50,9 @@ class TestLogDecorator:
             test_function(5, 0)
 
         captured = capsys.readouterr()
-        assert "test_function error: ZeroDivisionError. Inputs: (5, 0), {}" in captured.out
+        assert (
+            "test_function error: ZeroDivisionError. Inputs: (5, 0), {}" in captured.out
+        )
 
     def test_log_to_file_success(self, temp_log_file: str) -> None:
         """Тест логирования успешного выполнения в файл."""

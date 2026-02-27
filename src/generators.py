@@ -25,8 +25,8 @@ def filter_by_currency(
 
             if transaction_currency == currency:
                 yield transaction
-        except (KeyError, AttributeError, TypeError):
-        # except KeyError, AttributeError, TypeError:
+        except KeyError, AttributeError, TypeError:
+            # except KeyError, AttributeError, TypeError:
             # Пропускаем транзакции с некорректной структурой
             continue
 
@@ -46,7 +46,7 @@ def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, N
             description = transaction.get("description", "")
             if description:
                 yield description
-        except (KeyError, AttributeError, TypeError):
+        except KeyError, AttributeError, TypeError:
             continue
 
 
