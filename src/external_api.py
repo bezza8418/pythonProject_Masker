@@ -105,18 +105,36 @@ def get_transaction_amount_in_rub(transaction: dict) -> float:
 
     Returns:
         float: Сумма транзакции в рублях
+
+    Raises:
+        ValueError: При некорректной структуре транзакции
+        Exception: При ошибках конвертации валют
     """
     try:
-        # Получаем информацию о сумме и валюте из транзакции
+        # Проверяем наличие operationAmount
+        if "operationAmount" not in transaction:
+            raise ValueError("Некорректная структура транзакции: отсутствует operationAmount")
+
         operation_amount = transaction.get("operationAmount", {})
+
+        # Проверяем наличие amount
         amount = operation_amount.get("amount")
+        if amount is None:
+            raise ValueError("Некорректная структура транзакции: отсутствует сумма")
+
+        # Проверяем наличие currency
         currency_info = operation_amount.get("currency", {})
+        if not currency_info:
+            raise ValueError("Некорректная структура транзакции: отсутствует информация о валюте")
+
         currency_code = currency_info.get("code", "RUB")
 
-        if amount is None:
-            raise ValueError("В транзакции отсутствует сумма")
-
-        return convert_amount(amount, currency_code)
+        # Пытаемся конвертировать сумму
+        try:
+            return convert_amount(amount, currency_code)
+        except Exception as e:
+            # Для ошибок конвертации используем Exception с русским сообщением
+            raise Exception(f"Ошибка конвертации: {str(e)}")
 
     except (KeyError, AttributeError, TypeError) as e:
         raise ValueError(f"Некорректная структура транзакции: {str(e)}")
