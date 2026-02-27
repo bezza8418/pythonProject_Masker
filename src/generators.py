@@ -1,7 +1,6 @@
 """Модуль с генераторами для обработки транзакций."""
 
-from typing import Dict, Generator, Iterator, List
-
+from typing import List, Dict, Iterator
 
 def filter_by_currency(
     transactions: List[Dict], currency: str = "USD"
@@ -18,18 +17,18 @@ def filter_by_currency(
     """
     for transaction in transactions:
         try:
-            # Получаем информацию о валюте из вложенного словаря
             operation_amount = transaction.get("operationAmount", {})
             currency_info = operation_amount.get("currency", {})
             transaction_currency = currency_info.get("code")
 
             if transaction_currency == currency:
                 yield transaction
-        except KeyError, AttributeError, TypeError:
-            # except KeyError, AttributeError, TypeError:
+        except (KeyError, AttributeError, TypeError):
             # Пропускаем транзакции с некорректной структурой
             continue
 
+
+from typing import List, Dict, Generator
 
 def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, None]:
     """
@@ -46,7 +45,7 @@ def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, N
             description = transaction.get("description", "")
             if description:
                 yield description
-        except KeyError, AttributeError, TypeError:
+        except (KeyError, AttributeError, TypeError):  # Правильно: скобки
             continue
 
 
