@@ -197,6 +197,21 @@ def add(a: int, b: int) -> int:
 add(5, 3)  # В файл mylog.txt запишется: "add ok"
 ```
 
+### 14. Загрузка транзакций из JSON (`load_transactions`)
+```python
+from src.utils import load_transactions
+
+# Загрузка транзакций из файла
+transactions = load_transactions("data/operations.json")
+print(f"Загружено транзакций: {len(transactions)}")
+
+# Функция безопасно обрабатывает:
+# - Отсутствие файла
+# - Ошибки доступа
+# - Некорректный JSON
+# - Неверную структуру данных
+```
+
 ## 🧪 Тестирование
 
 ### Запуск всех тестов
@@ -216,18 +231,22 @@ pytest tests/test_masks.py -v
 pytest tests/test_widget.py -v
 pytest tests/test_processing.py -v
 pytest tests/test_decorators.py -v
+pytest tests/test_utils.py -v
+pytest tests/test_external_api.py -v
 ```
 
 ### Статистика покрытия (98%)
-| Модуль          | Строк   | Пропущено | Покрытие |
-|-----------------|---------|-----------|----------|
-| `__init__.py`   | 5       | 0         | 100%     |
-| `decorators.py` | 24      | 0         | 100%     |
-| `generators.py` | 24      | 0         | 100%     |
-| `masks.py`      | 45      | 0         | 100%     |
-| `processing.py` | 8       | 0         | 100%     |
-| `widget.py`     | 25      | 2         | 92%      |
-| **ИТОГО**       | **131** | **2**     | **98%**  |
+| Модуль            | Строк   | Пропущено | Покрытие |
+|-------------------|---------|-----------|----------|
+| `__init__.py`     | 7       | 0         | 100%     |
+| `decorators.py`   | 24      | 0         | 100%     |
+| `external_api.py` | 57      | 2         | 96%      |
+| `generators.py`   | 24      | 0         | 100%     |
+| `masks.py`        | 45      | 0         | 100%     |
+| `processing.py`   | 8       | 0         | 100%     |
+| `utils.py`        | 14      | 0         | 100%     |
+| `widget.py`       | 25      | 2         | 92%      |
+| **ИТОГО**         | **131** | **2**     | **98%**  |
 
 ### Генерация HTML-отчета
 ```bash
@@ -267,28 +286,34 @@ isort src/ tests/
 
 ```
 pythonProject_Masker/
+├── data/                   # Данные о финансовых транзациях
 ├── htmlcov/                # Отчет о покрытии тестами
 ├── src/                    # Исходный код
 │   ├── __init__.py         # Экспорт функций
+│   ├── decorators.py       # Декораторы для логирования
+│   ├── external.py         # Работа с внешними API для конвертации валют   
+│   ├── generators.py       # Генераторы для работы с транзакциями
 │   ├── masks.py            # Маскировка карт/счетов
 │   ├── processing.py       # Фильтрация и сортировка транзакций
-│   ├── widget.py           # Обработка строк карт/счетов
-│   ├── generators.py       # Генераторы для работы с транзакциями
-│   └── decorators.py       # Декораторы для логирования
+│   ├── utils.py            # Работа с JSON-файлами 
+│   └── widget.py           # Обработка строк карт/счетов
 ├── tests/                  # Тесты
 │   ├── __init__.py
-│   ├── test_masks.py       # Тесты для masks.py
-│   ├── test_widget.py      # Тесты для widget.py
-│   ├── test_processing.py  # Тесты для processing.py
+│   ├── test_decorators.py  # Тесты для decorators.py
+│   ├── test_external.py    # Тесты для external.py
 │   ├── test_generators.py  # Тесты для generators.py
-│   └── test_decorators.py  # Тесты для decorators.py
+│   ├── test_masks.py       # Тесты для masks.py
+│   ├── test_processing.py  # Тесты для processing.py
+│   ├── test_utils.py       # Тесты для utils.py
+│   └── test_widget.py      # Тесты для widget.py
+├── .coverage               # Данные о покрытии
+├── .env                    # Конфиденциальные данные
+├── .env.sample             # Образец конфиденциальных данных
 ├── .flake8                 # Конфигурация flake8
 ├── .gitignore              # Игнорируемые файлы
-├── .coverage               # Данные о покрытии
 ├── main.py                 # Точка входа
-├── pyproject.toml          # Конфигурация проекта
 ├── poetry.lock             # Зависимости poetry
-├── requirements.txt        # Зависимости pip
+├── pyproject.toml          # Конфигурация проекта
 └── README.md               # Документация
 ```
 

@@ -74,7 +74,7 @@ def convert_amount(amount: Union[str, float, int], from_currency: str) -> float:
     # Преобразуем сумму в float
     try:
         amount_float = float(amount)
-    except ValueError, TypeError:
+    except (ValueError, TypeError):
         raise ValueError(f"Некорректная сумма: {amount}")
 
     # Если валюта уже рубли, возвращаем как есть
