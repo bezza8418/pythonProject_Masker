@@ -212,6 +212,23 @@ print(f"Загружено транзакций: {len(transactions)}")
 # - Неверную структуру данных
 ```
 
+### 15. Логирование модулей (`masks` и `utils`)
+
+В проекте реализовано логирование для модулей `masks` и `utils`. Логи сохраняются в папку `logs/` в корне проекта.
+
+```python
+from src.logger import setup_logger
+
+# Создание логера для модуля
+logger = setup_logger(__name__, "module_name.log")
+
+# Использование
+logger.info("Информационное сообщение")
+logger.error("Сообщение об ошибке")
+logger.debug("Отладочное сообщение")
+logger.warning("Предупреждение")
+```
+
 ## 🧪 Тестирование
 
 ### Запуск всех тестов
@@ -233,20 +250,22 @@ pytest tests/test_processing.py -v
 pytest tests/test_decorators.py -v
 pytest tests/test_utils.py -v
 pytest tests/test_external_api.py -v
+pytest tests/test_logger.py -v
 ```
 
-### Статистика покрытия (98%)
+### Статистика покрытия (97%)
 | Модуль            | Строк   | Пропущено | Покрытие |
 |-------------------|---------|-----------|----------|
 | `__init__.py`     | 7       | 0         | 100%     |
 | `decorators.py`   | 24      | 0         | 100%     |
 | `external_api.py` | 57      | 2         | 96%      |
 | `generators.py`   | 24      | 0         | 100%     |
-| `masks.py`        | 45      | 0         | 100%     |
+| `logger.py`       | 16      | 1         | 94%      |
+| `masks.py`        | 72      | 0         | 100%     |
 | `processing.py`   | 8       | 0         | 100%     |
-| `utils.py`        | 14      | 0         | 100%     |
+| `utils.py`        | 26      | 3         | 88%      |
 | `widget.py`       | 25      | 2         | 92%      |
-| **ИТОГО**         | **131** | **2**     | **98%**  |
+| **ИТОГО**         | **259** | **8**     | **97%**  |
 
 ### Генерация HTML-отчета
 ```bash
@@ -288,11 +307,13 @@ isort src/ tests/
 pythonProject_Masker/
 ├── data/                   # Данные о финансовых транзациях
 ├── htmlcov/                # Отчет о покрытии тестами
+├── logs/                   # Логи работы программы
 ├── src/                    # Исходный код
 │   ├── __init__.py         # Экспорт функций
 │   ├── decorators.py       # Декораторы для логирования
-│   ├── external.py         # Работа с внешними API для конвертации валют   
+│   ├── external_apy.py     # Работа с внешними API для конвертации валют   
 │   ├── generators.py       # Генераторы для работы с транзакциями
+│   ├── logger.py           # Настройка логирования
 │   ├── masks.py            # Маскировка карт/счетов
 │   ├── processing.py       # Фильтрация и сортировка транзакций
 │   ├── utils.py            # Работа с JSON-файлами 
@@ -300,8 +321,9 @@ pythonProject_Masker/
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_decorators.py  # Тесты для decorators.py
-│   ├── test_external.py    # Тесты для external.py
+│   ├── test_external_apy.py# Тесты для external.py
 │   ├── test_generators.py  # Тесты для generators.py
+│   ├── test_logger.py      # Тесты для logger.py
 │   ├── test_masks.py       # Тесты для masks.py
 │   ├── test_processing.py  # Тесты для processing.py
 │   ├── test_utils.py       # Тесты для utils.py
