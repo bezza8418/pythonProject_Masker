@@ -1,15 +1,12 @@
 """Тесты для модуля generators."""
 
+# from typing import Dict, List, Any
+from typing import Any, Dict, List, Optional, Union
+
 import pytest
 
-# from typing import Dict, List, Any
-from typing import Dict, Any, List, Optional, Union
-
-from src.generators import (
-    filter_by_currency,
-    transaction_descriptions,
-    card_number_generator,
-)
+from src.generators import (card_number_generator, filter_by_currency,
+                            transaction_descriptions)
 
 
 @pytest.fixture

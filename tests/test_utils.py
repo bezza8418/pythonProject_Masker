@@ -5,7 +5,7 @@
 import json
 import os
 import tempfile
-from typing import Generator, List, Dict, Any
+from typing import Any, Dict, Generator, List
 
 import pytest
 
