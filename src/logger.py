@@ -18,8 +18,10 @@ def setup_logger(name: str, log_file: str, level: int = logging.INFO) -> logging
     Returns:
         logging.Logger: Настроенный логер
     """
+    # Определяем путь к папке logs в текущей рабочей директории
+    log_dir = os.path.join(os.getcwd(), "logs")
+
     # Создаем папку logs, если её нет
-    log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
     os.makedirs(log_dir, exist_ok=True)
 
     # Полный путь к файлу лога

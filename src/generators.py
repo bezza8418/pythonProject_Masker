@@ -1,6 +1,7 @@
 """Модуль с генераторами для обработки транзакций."""
 
-from typing import List, Dict, Iterator
+from typing import Dict, Iterator, List
+
 
 def filter_by_currency(
     transactions: List[Dict], currency: str = "USD"
@@ -28,9 +29,7 @@ def filter_by_currency(
             continue
 
 
-from typing import List, Dict, Generator
-
-def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, None]:
+def transaction_descriptions(transactions: List[Dict]) -> Iterator[str]:
     """
     Возвращает описания транзакций по очереди.
 
@@ -45,11 +44,11 @@ def transaction_descriptions(transactions: List[Dict]) -> Generator[str, None, N
             description = transaction.get("description", "")
             if description:
                 yield description
-        except (KeyError, AttributeError, TypeError):  # Правильно: скобки
+        except (KeyError, AttributeError, TypeError):
             continue
 
 
-def card_number_generator(start: int, end: int) -> Generator[str, None, None]:
+def card_number_generator(start: int, end: int) -> Iterator[str]:
     """
     Генерирует номера банковских карт в заданном диапазоне.
 

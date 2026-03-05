@@ -1,6 +1,5 @@
 """Модуль для маскирования банковских реквизитов."""
 
-import logging
 from typing import Any, Dict, List, Union
 
 from src.logger import setup_logger
@@ -12,6 +11,14 @@ logger = setup_logger(__name__, 'masks.log')
 def get_mask_card_number(card_number: str) -> str:
     """
     Функция принимает на вход номер карты и возвращает ее маску.
+    Номер карты замаскирован и отображается в формате XXXX XX** **** XXXX,
+    где X — это цифра номера.
+    То есть видны первые 6 цифр и последние 4 цифры,
+    остальные символы отображаются звездочками, номер разбит по блокам по 4 цифры,
+    разделенным пробелами.
+    Пример работы функции:
+    входной аргумент: 7000792289606361
+    выход функции: 7000 79** **** 6361
     """
     logger.info(f"Начало маскировки номера карты: {card_number[:4]}***")
 
@@ -33,6 +40,12 @@ def get_mask_card_number(card_number: str) -> str:
 def get_mask_account(account_number: str) -> str:
     """
     Функция принимает на вход номер счета и возвращает его маску.
+    Номер счета замаскирован и отображается в формате **XXXX,
+    где X — это цифра номера.
+    То есть видны только последние 4 цифры номера, а перед ними — две звездочки.
+    Пример работы функции:
+    входной аргумент: 73654108430135874305
+    выход функции: **4305
     """
     logger.info(f"Начало маскировки номера счета: {account_number[:4]}***")
 
@@ -54,6 +67,7 @@ def get_mask_account(account_number: str) -> str:
 def mask_personal_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Главная функция маскировки персональных данных.
+    Использует уже существующие функции маскировки из проекта.
     """
     logger.info(f"Начало маскировки персональных данных. Ключи: {list(data.keys())}")
 
@@ -135,11 +149,11 @@ def mask_financial_info(info_type: str, info_value: Union[str, int]) -> str:
     value_str = str(info_value)
     if info_type.lower() in ["card", "credit_card", "debit_card"]:
         result = get_mask_card_number(value_str)
-        logger.info(f"Финансовая информация (карта) замаскирована")
+        logger.info("Финансовая информация (карта) замаскирована")
         return result
     elif info_type.lower() in ["account", "bank_account"]:
         result = get_mask_account(value_str)
-        logger.info(f"Финансовая информация (счет) замаскирована")
+        logger.info("Финансовая информация (счет) замаскирована")
         return result
     else:
         logger.error(f"Неизвестный тип информации для маскировки: {info_type}")
