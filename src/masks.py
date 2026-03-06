@@ -1,11 +1,12 @@
 """Модуль для маскирования банковских реквизитов."""
 
+import logging
 from typing import Any, Dict, List, Union
 
 from src.logger import setup_logger
 
-# Настраиваем логер для модуля masks
-logger = setup_logger(__name__, 'masks.log')
+# Настраиваем логер для модуля masks с уровнем DEBUG
+logger = setup_logger(__name__, 'masks.log', level=logging.DEBUG)
 
 
 def get_mask_card_number(card_number: str) -> str:
@@ -21,6 +22,7 @@ def get_mask_card_number(card_number: str) -> str:
     выход функции: 7000 79** **** 6361
     """
     logger.info(f"Начало маскировки номера карты: {card_number[:4]}***")
+    logger.debug(f"Полный номер карты: {card_number}")
 
     # Удаляем все пробелы из номера
     digits_only = "".join(filter(lambda x: x.isdigit(), card_number))
@@ -48,6 +50,7 @@ def get_mask_account(account_number: str) -> str:
     выход функции: **4305
     """
     logger.info(f"Начало маскировки номера счета: {account_number[:4]}***")
+    logger.debug(f"Полный номер счета: {account_number}")
 
     # Удаляем все нецифровые символы
     digits_only = "".join(filter(lambda x: x.isdigit(), account_number))
@@ -70,6 +73,7 @@ def mask_personal_data(data: Dict[str, Any]) -> Dict[str, Any]:
     Использует уже существующие функции маскировки из проекта.
     """
     logger.info(f"Начало маскировки персональных данных. Ключи: {list(data.keys())}")
+    logger.debug(f"Полные данные: {data}")
 
     if not data:
         logger.warning("Получен пустой словарь данных")
@@ -133,6 +137,7 @@ def process_user_data(users_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Функция обработки списка пользователей с маскировкой данных.
     """
     logger.info(f"Начало обработки списка пользователей. Количество: {len(users_data)}")
+    logger.debug(f"Данные пользователей: {users_data}")
 
     result = [mask_personal_data(user) for user in users_data]
 
@@ -145,6 +150,7 @@ def mask_financial_info(info_type: str, info_value: Union[str, int]) -> str:
     Универсальная функция для маскировки финансовой информации
     """
     logger.info(f"Маскировка финансовой информации. Тип: {info_type}")
+    logger.debug(f"Значение для маскировки: {info_value}")
 
     value_str = str(info_value)
     if info_type.lower() in ["card", "credit_card", "debit_card"]:
