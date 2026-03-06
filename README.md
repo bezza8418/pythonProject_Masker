@@ -229,6 +229,22 @@ logger.debug("Отладочное сообщение")
 logger.warning("Предупреждение")
 ```
 
+### 16. Чтение транзакций из разных форматов
+
+```python
+from src.file_readers import read_transactions, read_json_file, read_csv_file, read_excel_file
+
+# Универсальная функция (определяет формат по расширению)
+json_transactions = read_transactions("data/operations.json")
+csv_transactions = read_transactions("data/transactions.csv")
+excel_transactions = read_transactions("data/transactions.xlsx")
+
+# Или использовать специализированные функции
+json_data = read_json_file("data/operations.json")
+csv_data = read_csv_file("data/transactions.csv")
+excel_data = read_excel_file("data/transactions.xlsx")
+```
+
 ## 🧪 Тестирование
 
 ### Запуск всех тестов
@@ -251,21 +267,23 @@ pytest tests/test_decorators.py -v
 pytest tests/test_utils.py -v
 pytest tests/test_external_api.py -v
 pytest tests/test_logger.py -v
+pytest tests/test_file_readers.py -v
 ```
 
-### Статистика покрытия (97%)
+### Статистика покрытия (95%)
 | Модуль            | Строк   | Пропущено | Покрытие |
 |-------------------|---------|-----------|----------|
-| `__init__.py`     | 7       | 0         | 100%     |
+| `__init__.py`     | 8       | 0         | 100%     |
 | `decorators.py`   | 24      | 0         | 100%     |
 | `external_api.py` | 57      | 2         | 96%      |
+| `file_readers.py` | 53      | 7         | 87%      |
 | `generators.py`   | 24      | 0         | 100%     |
 | `logger.py`       | 16      | 1         | 94%      |
-| `masks.py`        | 72      | 0         | 100%     |
+| `masks.py`        | 78      | 0         | 100%     |
 | `processing.py`   | 8       | 0         | 100%     |
-| `utils.py`        | 26      | 3         | 88%      |
+| `utils.py`        | 32      | 3         | 91%      |
 | `widget.py`       | 25      | 2         | 92%      |
-| **ИТОГО**         | **259** | **8**     | **97%**  |
+| **ИТОГО**         | **325** | **15**    | **95%**  |
 
 ### Генерация HTML-отчета
 ```bash
@@ -311,7 +329,8 @@ pythonProject_Masker/
 ├── src/                    # Исходный код
 │   ├── __init__.py         # Экспорт функций
 │   ├── decorators.py       # Декораторы для логирования
-│   ├── external_apy.py     # Работа с внешними API для конвертации валют   
+│   ├── external_api.py     # Работа с внешними API для конвертации валют   
+│   ├── file_readers.py     # Чтение финансовых транзакций из различных форматов   
 │   ├── generators.py       # Генераторы для работы с транзакциями
 │   ├── logger.py           # Настройка логирования
 │   ├── masks.py            # Маскировка карт/счетов
@@ -321,7 +340,8 @@ pythonProject_Masker/
 ├── tests/                  # Тесты
 │   ├── __init__.py
 │   ├── test_decorators.py  # Тесты для decorators.py
-│   ├── test_external_apy.py# Тесты для external.py
+│   ├── test_external_api.py# Тесты для external.py
+│   ├── test_file_readers.py# Тесты для file_readers
 │   ├── test_generators.py  # Тесты для generators.py
 │   ├── test_logger.py      # Тесты для logger.py
 │   ├── test_masks.py       # Тесты для masks.py
