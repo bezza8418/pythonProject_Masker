@@ -7,8 +7,11 @@ from unittest.mock import Mock, patch
 import pytest
 import requests
 
-from src.external_api import (convert_amount, get_exchange_rate,
-                              get_transaction_amount_in_rub)
+from src.external_api import (
+    convert_amount,
+    get_exchange_rate,
+    get_transaction_amount_in_rub,
+)
 
 
 class TestGetExchangeRate:

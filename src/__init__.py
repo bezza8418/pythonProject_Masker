@@ -1,13 +1,29 @@
 """Пакет для маскирования банковских реквизитов и работы с транзакциями."""
 
 from src.decorators import log
-from src.external_api import (convert_amount, get_exchange_rate,
-                              get_transaction_amount_in_rub)
-from src.generators import (card_number_generator, filter_by_currency,
-                            transaction_descriptions)
-from src.masks import (get_mask_account, get_mask_card_number,
-                       mask_financial_info, mask_personal_data,
-                       process_user_data)
+from src.external_api import (
+    convert_amount,
+    get_exchange_rate,
+    get_transaction_amount_in_rub,
+)
+from src.file_readers import (
+    read_csv_file,  # Добавляем новый модуль
+    read_excel_file,
+    read_json_file,
+    read_transactions,
+)
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
+from src.masks import (
+    get_mask_account,
+    get_mask_card_number,
+    mask_financial_info,
+    mask_personal_data,
+    process_user_data,
+)
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
 
@@ -33,4 +49,9 @@ __all__ = [
     "convert_amount",
     "get_exchange_rate",
     "get_transaction_amount_in_rub",
+    # Из file_readers.py
+    "read_json_file",
+    "read_csv_file",
+    "read_excel_file",
+    "read_transactions",
 ]

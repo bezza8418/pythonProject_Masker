@@ -18,8 +18,14 @@ def setup_logger(name: str, log_file: str, level: int = logging.INFO) -> logging
     Returns:
         logging.Logger: Настроенный логер
     """
-    # Определяем путь к папке logs в текущей рабочей директории
-    log_dir = os.path.join(os.getcwd(), "logs")
+    # Определяем путь к корню проекта через местоположение этого файла
+    # logger.py находится в src/, поднимаемся на уровень выше
+    current_file = os.path.abspath(__file__)  # полный путь к logger.py
+    src_dir = os.path.dirname(current_file)  # папка src/
+    project_root = os.path.dirname(src_dir)  # корень проекта
+
+    # Путь к папке logs в корне проекта
+    log_dir = os.path.join(project_root, "logs")
 
     # Создаем папку logs, если её нет
     os.makedirs(log_dir, exist_ok=True)
@@ -36,13 +42,13 @@ def setup_logger(name: str, log_file: str, level: int = logging.INFO) -> logging
         logger.handlers.clear()
 
     # Создаем обработчик для записи в файл (режим 'w' для перезаписи)
-    file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
+    file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
     file_handler.setLevel(level)
 
     # Настраиваем формат логов
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
     file_handler.setFormatter(formatter)
 
