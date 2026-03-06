@@ -9,6 +9,8 @@ package-mode = false
 python = ">=3.14"
 requests = "^2.32.5"
 python-dotenv = "^1.2.1"
+pandas = "^3.0.1"
+openpyxl = "^3.1.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
