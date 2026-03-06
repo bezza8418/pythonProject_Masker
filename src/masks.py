@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Union
 from src.logger import setup_logger
 
 # Настраиваем логер для модуля masks с уровнем DEBUG
-logger = setup_logger(__name__, 'masks.log', level=logging.DEBUG)
+logger = setup_logger(__name__, "masks.log", level=logging.DEBUG)
 
 
 def get_mask_card_number(card_number: str) -> str:

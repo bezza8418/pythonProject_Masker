@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from src.logger import setup_logger
 
 # Настраиваем логер для модуля utils с уровнем DEBUG
-logger = setup_logger(__name__, 'utils.log', level=logging.DEBUG)
+logger = setup_logger(__name__, "utils.log", level=logging.DEBUG)
 
 
 def load_transactions(file_path: str) -> List[Dict[str, Any]]:

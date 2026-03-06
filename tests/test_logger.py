@@ -5,62 +5,55 @@
 import logging
 import os
 import shutil
-from typing import Generator
-
-import pytest
 
 from src.logger import setup_logger
 
+# import pytest
 
-@pytest.fixture
-def temp_log_dir() -> Generator[str, None, None]:
-    """Фикстура для создания временной директории для логов."""
-    # Создаем временную директорию, которая будет использоваться как корень проекта
-    temp_dir = os.path.join(os.getcwd(), "temp_test_logs")
-    if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir, ignore_errors=True)
-    os.makedirs(temp_dir, exist_ok=True)
 
-    # Сохраняем текущую директорию
-    original_dir = os.getcwd()
-
-    # Переходим во временную директорию
-    os.chdir(temp_dir)
-
-    yield temp_dir
-
-    # Возвращаемся в исходную директорию
-    os.chdir(original_dir)
-
-    # Очищаем после тестов
-    if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir, ignore_errors=True)
+def get_logs_dir() -> str:
+    """Возвращает путь к папке logs в корне проекта."""
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(tests_dir)
+    return os.path.join(project_root, "logs")
 
 
 class TestLogger:
     """Тесты для функций логирования."""
 
-    def test_setup_logger_creates_logs_directory(self, temp_log_dir: str) -> None:
+    def setup_method(self):
+        """Подготовка перед каждым тестом."""
+        self.logs_dir = get_logs_dir()
+        # Удаляем папку logs, если она существует
+        if os.path.exists(self.logs_dir):
+            shutil.rmtree(self.logs_dir, ignore_errors=True)
+
+    def teardown_method(self):
+        """Очистка после каждого теста."""
+        # Удаляем папку logs после теста
+        if os.path.exists(self.logs_dir):
+            shutil.rmtree(self.logs_dir, ignore_errors=True)
+
+    def test_setup_logger_creates_logs_directory(self) -> None:
         """Тест создания директории logs."""
         # Создаем логгер
         logger = setup_logger("test_logger", "test.log")
 
-        # Проверяем, что директория logs создана в текущей директории
-        logs_dir = os.path.join(os.getcwd(), "logs")
-        assert os.path.exists(logs_dir), f"Директория {logs_dir} не создана"
+        # Проверяем, что директория logs создана
+        assert os.path.exists(self.logs_dir), f"Директория {self.logs_dir} не создана"
 
         # Закрываем обработчики
         for handler in logger.handlers[:]:
             handler.close()
             logger.removeHandler(handler)
 
-    def test_setup_logger_creates_log_file(self, temp_log_dir: str) -> None:
+    def test_setup_logger_creates_log_file(self) -> None:
         """Тест создания файла лога."""
         # Создаем логгер
         logger = setup_logger("test_logger", "test.log")
 
         # Проверяем, что файл создан
-        log_file = os.path.join(os.getcwd(), "logs", "test.log")
+        log_file = os.path.join(self.logs_dir, "test.log")
         assert os.path.exists(log_file), f"Файл {log_file} не создан"
 
         # Закрываем обработчики
@@ -68,7 +61,7 @@ class TestLogger:
             handler.close()
             logger.removeHandler(handler)
 
-    def test_setup_logger_writes_to_file(self, temp_log_dir: str) -> None:
+    def test_setup_logger_writes_to_file(self) -> None:
         """Тест записи в файл лога."""
         # Создаем логгер и пишем сообщение
         logger = setup_logger("test_logger", "test.log")
@@ -81,14 +74,14 @@ class TestLogger:
             logger.removeHandler(handler)
 
         # Проверяем содержимое файла
-        log_file = os.path.join(os.getcwd(), "logs", "test.log")
+        log_file = os.path.join(self.logs_dir, "test.log")
         assert os.path.exists(log_file)
 
         with open(log_file, "r", encoding="utf-8") as f:
             content = f.read()
             assert test_message in content
 
-    def test_setup_logger_respects_log_level(self, temp_log_dir: str) -> None:
+    def test_setup_logger_respects_log_level(self) -> None:
         """Тест соблюдения уровня логирования."""
         # Создаем логгер с уровнем WARNING
         logger = setup_logger("test_logger", "test.log", level=logging.WARNING)
@@ -104,8 +97,8 @@ class TestLogger:
             handler.close()
             logger.removeHandler(handler)
 
-        # Проверяем, что только WARNING и ERROR попали в лог
-        log_file = os.path.join(os.getcwd(), "logs", "test.log")
+        # Проверяем содержимое файла
+        log_file = os.path.join(self.logs_dir, "test.log")
         assert os.path.exists(log_file)
 
         with open(log_file, "r", encoding="utf-8") as f:

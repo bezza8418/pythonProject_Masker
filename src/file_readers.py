@@ -7,7 +7,6 @@ import json
 from typing import Any, Dict, List
 
 import pandas as pd
-from pandas.errors import EmptyDataError, ParserError
 
 
 def read_json_file(file_path: str) -> List[Dict[str, Any]]:
@@ -25,7 +24,16 @@ def read_json_file(file_path: str) -> List[Dict[str, Any]]:
             data = json.load(file)
 
         if isinstance(data, list):
-            return data
+            # Приводим все ключи к строковому типу
+            result = []
+            for item in data:
+                if isinstance(item, dict):
+                    # Преобразуем все ключи в строки
+                    str_dict = {str(k): v for k, v in item.items()}
+                    result.append(str_dict)
+                else:
+                    return []
+            return result
         else:
             return []
     except FileNotFoundError:
@@ -48,21 +56,24 @@ def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
     """
     try:
         df = pd.read_csv(file_path)
-        # Преобразуем DataFrame в список словарей
-        transactions = df.to_dict(orient='records')
-        return transactions
+        # Преобразуем DataFrame в список словарей со строковыми ключами
+        records = df.to_dict(orient='records')
+
+        # Приводим все ключи к строковому типу
+        result = []
+        for record in records:
+            str_record = {str(k): v for k, v in record.items()}
+            result.append(str_record)
+        return result
     except FileNotFoundError:
         return []
     except PermissionError:
         return []
-    except EmptyDataError:
-        # Файл пустой
+    except pd.errors.EmptyDataError:
         return []
-    except ParserError:
-        # Ошибка парсинга CSV
+    except pd.errors.ParserError:
         return []
     except UnicodeDecodeError:
-        # Проблема с кодировкой
         return []
 
 
@@ -78,18 +89,22 @@ def read_excel_file(file_path: str) -> List[Dict[str, Any]]:
     """
     try:
         df = pd.read_excel(file_path)
-        # Преобразуем DataFrame в список словарей
-        transactions = df.to_dict(orient='records')
-        return transactions
+        # Преобразуем DataFrame в список словарей со строковыми ключами
+        records = df.to_dict(orient='records')
+
+        # Приводим все ключи к строковому типу
+        result = []
+        for record in records:
+            str_record = {str(k): v for k, v in record.items()}
+            result.append(str_record)
+        return result
     except FileNotFoundError:
         return []
     except PermissionError:
         return []
     except ValueError:
-        # Ошибка при чтении Excel (например, файл поврежден)
         return []
     except ImportError:
-        # Нет нужной библиотеки для чтения Excel
         return []
 
 
