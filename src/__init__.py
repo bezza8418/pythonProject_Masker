@@ -1,22 +1,14 @@
 """Пакет для маскирования банковских реквизитов и работы с транзакциями."""
 
 from src.decorators import log
-from src.external_api import (
-    convert_amount,
-    get_exchange_rate,
-    get_transaction_amount_in_rub,
-)
+from src.external_api import convert_amount, get_exchange_rate, get_transaction_amount_in_rub
 from src.file_readers import (
-    read_csv_file,  # Добавляем новый модуль
+    read_csv_file,
     read_excel_file,
     read_json_file,
     read_transactions,
 )
-from src.generators import (
-    card_number_generator,
-    filter_by_currency,
-    transaction_descriptions,
-)
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import (
     get_mask_account,
     get_mask_card_number,
