@@ -16,6 +16,7 @@ from src.masks import (
     mask_personal_data,
     process_user_data,
 )
+from src.search import count_by_categories, filter_by_description
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
 
@@ -46,4 +47,6 @@ __all__ = [
     "read_csv_file",
     "read_excel_file",
     "read_transactions",
+    "filter_by_description",
+    "count_by_categories",
 ]
