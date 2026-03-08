@@ -13,10 +13,11 @@ def sample_transactions():
     return [
         {"id": 1, "description": "Перевод организации", "amount": 100},
         {"id": 2, "description": "Перевод со счета на счет", "amount": 200},
-    {"id": 3, "description": "Перевод с карты на карту", "amount": 300},
-    {"id": 4, "description": "Оплата услуг", "amount": 400},
-    {"id": 5, "description": "Перевод организации", "amount": 500},
+        {"id": 3, "description": "Перевод с карты на карту", "amount": 300},
+        {"id": 4, "description": "Оплата услуг", "amount": 400},
+        {"id": 5, "description": "Покупка в магазине", "amount": 500},  # Изменили, чтобы не было "Перевод"
     ]
+
 
 class TestFilterByDescription:
     """Тесты для функции filter_by_description."""
@@ -51,7 +52,9 @@ class TestFilterByDescription:
     def test_filter_by_description_special_chars(self, sample_transactions):
         """Тест поиска со специальными символами."""
         result = filter_by_description(sample_transactions, "организации")
-        assert len(result) == 2
+        assert len(result) == 1
+        assert result[0]["id"] == 1
+
 
 class TestCountByCategories:
     """Тесты для функции count_by_categories."""

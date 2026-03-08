@@ -25,13 +25,10 @@ def filter_by_description(transactions: List[Dict], search_string: str) -> List[
     # Создаем регистронезависимое регулярное выражение
     pattern = re.compile(re.escape(search_string), re.IGNORECASE)
 
-    result = []
-    for transaction in transactions:
-        description = transaction.get("description", "")
-        if pattern.search(description):
-            result.append(transaction)
-
-    return result
+    return [
+        t for t in transactions
+        if pattern.search(t.get("description", ""))
+    ]
 
 
 def count_by_categories(transactions: List[Dict], categories: List[str]) -> Dict[str, int]:
